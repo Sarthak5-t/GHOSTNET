@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>GHOSTNET</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #0c0c0c;
+      --s1: #111;
+      --s2: #161616;
+      --s3: #1c1c1c;
+      --b1: #242424;
+      --b2: #2e2e2e;
+      --b3: #3a3a3a;
+      --t1: #e8e8e8;
+      --t2: #888;
+      --t3: #444;
+      --g: #00ff88;
+      --g2: #00cc66;
+      --r: #ff4444;
+      --r2: #cc2222;
+      --a: #ffaa00;
+      --a2: #cc7700;
+      --bl: #4499ff;
+      --bl2: #2266cc;
+      --p: #aa77ff;
+      --gpt-color: #ff6000;
+      --gpt-color2: #cc4400;
+      /* Brave Leo orange */
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--t1);
+      font-family: var(--sans);
+      font-size: 13px;
+      overflow: hidden
+    }
+
+    /* APP SHELL */
+    .app {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      grid-template-rows: 1fr 26px;
+      height: 100vh
+    }
+
+    /* SIDENAV */
+    .sidenav {
+      grid-row: 1/3;
+      background: var(--s1);
+      border-right: 1px solid var(--b1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 0;
+      gap: 3px
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--g);
+      margin-bottom: 8px;
+      letter-spacing: -2px
+    }
+
+    .nsep {
+      width: 20px;
+      height: 1px;
+      background: var(--b1);
+      margin: 4px 0
+    }
+
+    .nb {
+      width: 34px;
+      height: 34px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--t3);
+      transition: all .15s;
+      border: 1px solid transparent;
+      position: relative
+    }
+
+    .nb:hover {
+      color: var(--t2);
+      background: var(--s2)
+    }
+
+    .nb.on {
+      color: var(--t1);
+      background: var(--s3);
+      border-color: var(--b2)
+    }
+
+    .nb[data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 42px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--s3);
+      border: 1px solid var(--b2);
+      color: var(--t1);
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 3px 7px;
+      border-radius: 3px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 100
+    }
+
+    /* MAIN */
+    .main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden
+    }
+
+    .topbar {
+      height: 38px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--b1);
+      background: var(--s1)
+    }
+
+    .tb-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--t2);
+      letter-spacing: .05em
+    }
+
+    .tb-title b {
+      color: var(--t1);
+      font-weight: 400
+    }
+
+    .srv {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--t3)
+    }
+
+    .sdot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--t3);
+      flex-shrink: 0;
+      position: relative
+    }
+
+    .sdot.on {
+      background: var(--g)
+    }
+
+    .sdot.on::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      background: var(--g);
+      opacity: .3;
+      animation: pr 2s ease infinite
+    }
+
+    @keyframes pr {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: .3
+      }
+
+      50% {
+        transform: scale(2.2);
+        opacity: 0
+      }
+    }
+
+    /* CONTENT */
+    .pane {
+      flex: 1;
+      overflow: hidden;
+      display: none;
+      flex-direction: column
+    }
+
+    .pane.on {
+      display: flex
+    }
+
+    .scrl {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px
+    }
+
+    .scrl::-webkit-scrollbar {
+      width: 3px
+    }
+
+    .scrl::-webkit-scrollbar-thumb {
+      background: var(--b2);
+      border-radius: 2px
+    }
+
+    /* STATUSBAR */
+    .statusbar {
+      grid-column: 2;
+      height: 26px;
+      background: var(--s1);
+      border-top: 1px solid var(--b1);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 14px;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--t3)
+    }
+
+    .statusbar b {
+      color: var(--t2);
+      font-weight: 400
+    }
+
+    .sep {
+      color: var(--b2)
+    }
+
+    /* INPUTS */
+    input,
+    textarea,
+    select {
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      color: var(--t1);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 6px 9px;
+      border-radius: 3px;
+      outline: none;
+      transition: border-color .15s
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--b3)
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--t3)
+    }
+
+    textarea {
+      resize: vertical;
+      line-height: 1.7;
+      width: 100%
+    }
+
+    select {
+      cursor: pointer
+    }
+
+    select option {
+      background: var(--s2)
+    }
+
+    /* BUTTONS */
+    .btn {
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 3px;
+      border: 1px solid var(--b2);
+      background: transparent;
+      color: var(--t2);
+      font-family: var(--mono);
+      font-size: 9px;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .btn:hover {
+      border-color: var(--b3);
+      color: var(--t1);
+      background: var(--s3)
+    }
+
+    .btn:active {
+      transform: scale(.98)
+    }
+
+    .btn:disabled {
+      opacity: .3;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .btn-g {
+      border-color: var(--g2);
+      color: var(--g)
+    }
+
+    .btn-g:hover {
+      background: rgba(0, 255, 136, .05)
+    }
+
+    .btn-r {
+      border-color: var(--r2);
+      color: var(--r)
+    }
+
+    .btn-r:hover {
+      background: rgba(255, 68, 68, .05)
+    }
+
+    .btn-a {
+      border-color: var(--a2);
+      color: var(--a)
+    }
+
+    .btn-a:hover {
+      background: rgba(255, 170, 0, .05)
+    }
+
+    .btn-b {
+      border-color: var(--bl2);
+      color: var(--bl)
+    }
+
+    .btn-b:hover {
+      background: rgba(68, 153, 255, .05)
+    }
+
+    .btn-p {
+      border-color: #7755cc;
+      color: var(--p)
+    }
+
+    .btn-p:hover {
+      background: rgba(170, 119, 255, .05)
+    }
+
+    .btn-gpt {
+      border-color: var(--gpt-color2);
+      color: var(--gpt-color)
+    }
+
+    .btn-gpt:hover {
+      background: rgba(255, 96, 0, .07)
+    }
+
+    .btn-primary {
+      background: var(--g);
+      color: #000;
+      border-color: var(--g);
+      font-weight: 500
+    }
+
+    .btn-primary:hover {
+      background: var(--g2);
+      border-color: var(--g2);
+      color: #000
+    }
+
+    /* CARD */
+    .card {
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 8px
+    }
+
+    .ch {
+      padding: 7px 11px;
+      border-bottom: 1px solid var(--b1);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--s3)
+    }
+
+    .ch-title {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--t2);
+      letter-spacing: .06em
+    }
+
+    .acc {
+      width: 2px;
+      height: 11px;
+      border-radius: 1px;
+      flex-shrink: 0
+    }
+
+    .cb {
+      padding: 10px 11px
+    }
+
+    /* BADGES */
+    .badge {
+      font-family: var(--mono);
+      font-size: 8px;
+      padding: 1px 5px;
+      border-radius: 2px;
+      border: 1px solid;
+      display: inline-flex;
+      align-items: center
+    }
+
+    .bg {
+      color: var(--g);
+      border-color: var(--g2);
+      background: rgba(0, 255, 136, .07)
+    }
+
+    .br {
+      color: var(--r);
+      border-color: var(--r2);
+      background: rgba(255, 68, 68, .07)
+    }
+
+    .ba {
+      color: var(--a);
+      border-color: var(--a2);
+      background: rgba(255, 170, 0, .07)
+    }
+
+    .bb {
+      color: var(--bl);
+      border-color: var(--bl2);
+      background: rgba(68, 153, 255, .07)
+    }
+
+    .bp {
+      color: var(--p);
+      border-color: #7755cc;
+      background: rgba(170, 119, 255, .07)
+    }
+
+    .bd {
+      color: var(--t3);
+      border-color: var(--b1)
+    }
+
+    .sev-CRITICAL {
+      color: var(--r);
+      border-color: var(--r2);
+      background: rgba(255, 68, 68, .1)
+    }
+
+    .sev-HIGH {
+      color: #ff7722;
+      border-color: #aa4411;
+      background: rgba(255, 119, 34, .1)
+    }
+
+    .sev-MEDIUM {
+      color: var(--a);
+      border-color: var(--a2);
+      background: rgba(255, 170, 0, .1)
+    }
+
+    .sev-LOW {
+      color: var(--g);
+      border-color: var(--g2);
+      background: rgba(0, 255, 136, .1)
+    }
+
+    .sev-UNKNOWN {
+      color: var(--t3);
+      border-color: var(--b1)
+    }
+
+    /* CHIPS */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 10px
+    }
+
+    .chip {
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 2px;
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      color: var(--t3);
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .chip:hover {
+      color: var(--t1);
+      border-color: var(--b3);
+      background: var(--s3)
+    }
+
+    .chip.on {
+      color: var(--g);
+      border-color: var(--g2);
+      background: rgba(0, 255, 136, .05)
+    }
+
+    /* TOGGLE */
+    .tog {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 9px;
+      padding: 3px 7px;
+      border-radius: 2px;
+      border: 1px solid var(--b1);
+      background: transparent;
+      color: var(--t3);
+      cursor: pointer;
+      transition: all .15s;
+      user-select: none
+    }
+
+    .tog:hover {
+      border-color: var(--b2);
+      color: var(--t2)
+    }
+
+    .tog.on {
+      color: var(--g);
+      border-color: var(--g2);
+      background: rgba(0, 255, 136, .05)
+    }
+
+    .tdot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor
+    }
+
+    /* COMPOSE */
+    .compose {
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      border-radius: 5px;
+      overflow: hidden;
+      transition: border-color .15s;
+      margin-bottom: 10px
+    }
+
+    .compose:focus-within {
+      border-color: var(--b3)
+    }
+
+    .cmeta {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 9px;
+      border-bottom: 1px solid var(--b1);
+      background: var(--s3);
+      flex-wrap: wrap
+    }
+
+    .compose textarea {
+      border: none;
+      background: transparent;
+      min-height: 68px;
+      padding: 9px 11px
+    }
+
+    .cfoot {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 7px;
+      border-top: 1px solid var(--b1);
+      flex-wrap: wrap
+    }
+
+    .mtag {
+      font-family: var(--mono);
+      font-size: 8px;
+      padding: 1px 6px;
+      border-radius: 2px;
+      border: 1px solid;
+      letter-spacing: .05em;
+      text-transform: uppercase
+    }
+
+    /* LOG */
+    .entry {
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      border-radius: 5px;
+      margin-bottom: 7px;
+      overflow: hidden;
+      animation: ein .2s ease
+    }
+
+    @keyframes ein {
+      from {
+        opacity: 0;
+        transform: translateY(3px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .eh {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 9px;
+      background: var(--s3);
+      border-bottom: 1px solid var(--b1)
+    }
+
+    .ep {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--t2);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .et {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--t3);
+      white-space: nowrap;
+      flex-shrink: 0
+    }
+
+    .eb {
+      padding: 10px 12px;
+      max-height: 380px;
+      overflow-y: auto;
+      word-break: break-word
+    }
+
+    .eb::-webkit-scrollbar {
+      width: 2px
+    }
+
+    .eb::-webkit-scrollbar-thumb {
+      background: var(--b2)
+    }
+
+    .eb.loading {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--t3);
+      font-family: var(--mono);
+      font-size: 9px
+    }
+
+    .eb.err {
+      color: var(--r);
+      font-family: var(--mono);
+      font-size: 10px;
+      white-space: pre-wrap
+    }
+
+    /* DOTS / SPIN */
+    .dots {
+      display: flex;
+      gap: 3px
+    }
+
+    .dots span {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--g);
+      animation: dt 1.2s infinite
+    }
+
+    .dots span:nth-child(2) {
+      animation-delay: .2s
+    }
+
+    .dots span:nth-child(3) {
+      animation-delay: .4s
+    }
+
+    @keyframes dt {
+
+      0%,
+      80%,
+      100% {
+        opacity: .3
+      }
+
+      40% {
+        opacity: 1;
+        transform: scale(1.3)
+      }
+    }
+
+    .spin {
+      width: 10px;
+      height: 10px;
+      border: 1.5px solid var(--b2);
+      border-top-color: var(--g);
+      border-radius: 50%;
+      animation: sp .7s linear infinite;
+      flex-shrink: 0
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .ldr {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--t3);
+      padding: 10px
+    }
+
+    /* MARKDOWN */
+    .md p {
+      margin: 0 0 8px;
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--t1)
+    }
+
+    .md p:last-child {
+      margin: 0
+    }
+
+    .md strong {
+      color: #fff;
+      font-weight: 500
+    }
+
+    .md h1,
+    .md h2,
+    .md h3 {
+      font-family: var(--mono);
+      margin: 10px 0 5px;
+      font-weight: 500
+    }
+
+    .md h1 {
+      font-size: 13px;
+      color: var(--g)
+    }
+
+    .md h2 {
+      font-size: 12px;
+      color: var(--t1)
+    }
+
+    .md h3 {
+      font-size: 11px;
+      color: var(--a)
+    }
+
+    .md ul,
+    .md ol {
+      margin: 5px 0 7px;
+      padding-left: 0;
+      list-style: none
+    }
+
+    .md li {
+      position: relative;
+      padding: 2px 0 2px 13px;
+      font-size: 12px;
+      line-height: 1.7
+    }
+
+    .md ul li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--g)
+    }
+
+    .md ol {
+      counter-reset: oc
+    }
+
+    .md ol li {
+      counter-increment: oc
+    }
+
+    .md ol li::before {
+      content: counter(oc)'.';
+      position: absolute;
+      left: 0;
+      color: var(--a);
+      font-family: var(--mono);
+      font-size: 9px;
+      top: 4px
+    }
+
+    .md code {
+      font-family: var(--mono);
+      font-size: 10px;
+      background: var(--s3);
+      color: var(--a);
+      padding: 1px 4px;
+      border-radius: 2px;
+      border: 1px solid var(--b1)
+    }
+
+    .md pre {
+      background: var(--bg);
+      border: 1px solid var(--b1);
+      border-radius: 4px;
+      margin: 7px 0;
+      overflow: hidden
+    }
+
+    .ctop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 9px;
+      background: var(--s3);
+      border-bottom: 1px solid var(--b1)
+    }
+
+    .clang {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--g);
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    .cpbtn {
+      font-family: var(--mono);
+      font-size: 8px;
+      padding: 1px 5px;
+      border-radius: 2px;
+      background: transparent;
+      border: 1px solid var(--b1);
+      color: var(--t3);
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .cpbtn:hover {
+      border-color: var(--b3);
+      color: var(--t1)
+    }
+
+    .cpbtn.ok {
+      color: var(--g);
+      border-color: var(--g2)
+    }
+
+    .md pre code {
+      display: block;
+      background: transparent;
+      border: none;
+      padding: 9px 11px;
+      font-size: 10px;
+      line-height: 1.8;
+      color: var(--t1);
+      overflow-x: auto;
+      white-space: pre
+    }
+
+    .md pre code::-webkit-scrollbar {
+      height: 2px
+    }
+
+    .md pre code::-webkit-scrollbar-thumb {
+      background: var(--b2)
+    }
+
+    .md blockquote {
+      border-left: 2px solid var(--g2);
+      margin: 5px 0;
+      padding: 4px 9px;
+      background: rgba(0, 255, 136, .03);
+      color: var(--t2)
+    }
+
+    .md hr {
+      border: none;
+      border-top: 1px solid var(--b1);
+      margin: 8px 0
+    }
+
+    .md a {
+      color: var(--bl);
+      text-decoration: none
+    }
+
+    .md a:hover {
+      text-decoration: underline
+    }
+
+    .md table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 7px 0;
+      font-size: 10px
+    }
+
+    .md th {
+      background: var(--s3);
+      border: 1px solid var(--b1);
+      padding: 4px 7px;
+      color: var(--t2);
+      font-family: var(--mono);
+      font-weight: 400;
+      font-size: 8px;
+      letter-spacing: .06em;
+      text-transform: uppercase
+    }
+
+    .md td {
+      border: 1px solid var(--b1);
+      padding: 3px 7px;
+      color: var(--t2)
+    }
+
+    .md tr:hover td {
+      background: var(--s3)
+    }
+
+    /* CVE */
+    .cvc {
+      padding: 8px 10px;
+      border: 1px solid var(--b1);
+      border-radius: 3px;
+      background: var(--s2);
+      cursor: pointer;
+      transition: all .15s;
+      margin-bottom: 4px
+    }
+
+    .cvc:hover,
+    .cvc.sel {
+      border-color: var(--b3);
+      background: var(--s3)
+    }
+
+    .cvi {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--a);
+      font-weight: 500
+    }
+
+    .cvd {
+      font-size: 10px;
+      color: var(--t3);
+      line-height: 1.5;
+      margin-top: 3px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical
+    }
+
+    /* ATTACK CARDS */
+    .akc {
+      padding: 10px;
+      border: 1px solid var(--b1);
+      border-radius: 4px;
+      background: var(--s2);
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .akc:hover {
+      border-color: var(--b2);
+      background: var(--s3)
+    }
+
+    .akc.sel {
+      border-color: var(--g2);
+      background: rgba(0, 255, 136, .03)
+    }
+
+    .aki {
+      font-size: 16px;
+      margin-bottom: 5px
+    }
+
+    .akt {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--t1);
+      margin-bottom: 2px
+    }
+
+    .akd {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--t3);
+      line-height: 1.4
+    }
+
+    /* TARGET PILLS */
+    .tgt {
+      padding: 4px 9px;
+      border-radius: 2px;
+      border: 1px solid var(--b1);
+      background: var(--s2);
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--t3);
+      cursor: pointer;
+      transition: all .15s;
+      text-align: center;
+      user-select: none
+    }
+
+    .tgt:hover {
+      border-color: var(--b2);
+      color: var(--t2)
+    }
+
+    .tgt.sel {
+      border-color: var(--p);
+      color: var(--p);
+      background: rgba(170, 119, 255, .05)
+    }
+
+    /* PROBE BTNS */
+    .prbtn {
+      padding: 7px 9px;
+      border-radius: 3px;
+      border: 1px solid var(--b1);
+      background: var(--s2);
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--t2)
+    }
+
+    .prbtn:hover {
+      border-color: var(--b2);
+      background: var(--s3)
+    }
+
+    .prbtn.sel {
+      border-color: var(--g2);
+      color: var(--g);
+      background: rgba(0, 255, 136, .04)
+    }
+
+    /* SCORE RING */
+    .sring {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border: 2px solid var(--b2);
+      flex-shrink: 0
+    }
+
+    /* RESULT ROWS */
+    .rrow {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      padding: 6px 8px;
+      border-radius: 3px;
+      background: var(--s3);
+      border: 1px solid var(--b1);
+      margin-bottom: 4px;
+      border-left: 2px solid
+    }
+
+    .rpass {
+      border-left-color: var(--g)
+    }
+
+    .rfail {
+      border-left-color: var(--r)
+    }
+
+    .rwarn {
+      border-left-color: var(--a)
+    }
+
+    .rerr {
+      border-left-color: var(--t3)
+    }
+
+    /* INST ROWS */
+    .irow {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 9px;
+      border-radius: 3px;
+      background: var(--s3);
+      border: 1px solid var(--b1);
+      margin-bottom: 5px
+    }
+
+    /* GRID HELPERS */
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px
+    }
+
+    .ga {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 5px
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 7px
+    }
+
+    .mla {
+      margin-left: auto
+    }
+
+    .w100 {
+      width: 100%
+    }
+
+    .mt6 {
+      margin-top: 6px
+    }
+
+    .lbl {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--t3);
+      margin-bottom: 4px
+    }
+
+    .empty {
+      border: 1px dashed var(--b1);
+      border-radius: 4px;
+      padding: 2.5rem;
+      text-align: center;
+      color: var(--t3);
+      font-family: var(--mono);
+      font-size: 9px;
+      line-height: 2
+    }
+
+    .dcve {
+      font-family: var(--mono);
+      font-size: 8px;
+      padding: 1px 5px;
+      border-radius: 2px;
+      background: rgba(255, 170, 0, .08);
+      border: 1px solid var(--a2);
+      color: var(--a);
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .dcve:hover {
+      background: rgba(255, 170, 0, .16)
+    }
+
+    /* LEO */
+    .gpt-bubble {
+      background: linear-gradient(135deg, rgba(255, 96, 0, .12), rgba(255, 96, 0, .04));
+      border: 1px solid var(--gpt-color2);
+      border-radius: 5px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      animation: ein .2s ease
+    }
+
+    .gpt-bubble .lbh {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px
+    }
+
+    .gpt-bubble .lbl-gpt {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--gpt-color);
+      letter-spacing: .08em
+    }
+
+    .user-bubble {
+      background: var(--s2);
+      border: 1px solid var(--b1);
+      border-radius: 5px;
+      padding: 8px 12px;
+      margin-bottom: 4px;
+      animation: ein .2s ease
+    }
+
+    .user-bubble .ubh {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--t3);
+      margin-bottom: 4px
+    }
+
+    .gpt-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--gpt-color);
+      padding: 8px 2px
+    }
+
+    /* ── LEO HEADLESS CHAT ─────────────────────────────────────── */
+    #p-l { flex-direction: column }
+    .chat-header {
+      height: 36px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--b1);
+      background: var(--s1);
+    }
+    .status-pill {
+      font-family: var(--mono);
+      font-size: 7px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 1px solid #ff600055;
+      background: rgba(255,96,0,.08);
+      color: var(--gpt-color);
+      letter-spacing: .06em;
+    }
+    .chat-log {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chat-log::-webkit-scrollbar { width: 3px }
+    .chat-log::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 2px }
+    .msg { display: flex; flex-direction: column; gap: 3px }
+    .msg-meta {
+      font-family: var(--mono);
+      font-size: 7px;
+      letter-spacing: .1em;
+      color: var(--t3);
+    }
+    .msg.ai .msg-meta { color: var(--gpt-color) }
+    .msg-cnt {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--t1);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .msg.user .msg-cnt {
+      background: var(--s2);
+      border: 1px solid var(--b2);
+      border-radius: 4px;
+      padding: 7px 10px;
+      color: var(--t2);
+    }
+    .msg.ai .msg-cnt {
+      border-left: 2px solid var(--gpt-color2);
+      padding-left: 10px;
+    }
+    .chat-compose {
+      flex-shrink: 0;
+      border-top: 1px solid var(--b1);
+      padding: 10px 14px;
+      background: var(--s1);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .chat-compose textarea {
+      width: 100%;
+      min-height: 60px;
+      resize: none;
+      background: var(--s2);
+      border: 1px solid var(--b2);
+      color: var(--t1);
+      font-family: var(--sans);
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 4px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .chat-compose textarea:focus { border-color: var(--b3) }
+    /* debug view */
+    .leo-debug-view {
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--b1);
+      background: var(--s2);
+      max-height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+    .leo-debug-lbl {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      font-family: var(--mono);
+      font-size: 7px;
+      color: var(--t3);
+      background: rgba(12,12,12,.7);
+      padding: 3px 8px;
+      letter-spacing: .06em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      z-index: 2;
+    }
+    .leo-debug-view img {
+      width: 100%;
+      display: block;
+      opacity: .85;
+      transition: opacity .3s;
+      margin-top: 18px;
+    }
+    .leo-debug-view img:hover { opacity: 1 }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDENAV -->
+    <nav class="sidenav">
+      <div class="logo">◈</div>
+      <div class="nsep"></div>
+      <div class="nb on" id="nb-t" data-tip="Terminal" onclick="sw('t')">⌨</div>
+      <div class="nb" id="nb-c" data-tip="CVE Intel" onclick="sw('c')">◉</div>
+      <div class="nb" id="nb-e" data-tip="Exploit Gen" onclick="sw('e')">⚡</div>
+      <div class="nb" id="nb-r" data-tip="Recon" onclick="sw('r')">◎</div>
+      <div class="nb" id="nb-a" data-tip="AI Pentest" onclick="sw('a')">🤖</div>
+      <div class="nb" id="nb-m" data-tip="Model Auditor" onclick="sw('m');loadStatus()">⬡</div>
+      <div class="nsep"></div>
+      <div class="nb" id="nb-l" data-tip="Brave Leo" onclick="var w = window.open('', 'BraveLeo', 'width=1000,height=800'); w.location.href = 'https://search.brave.com/ask';" style="color:#ff6000">◈</div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-title">GHOSTNET / <b id="tbt">terminal</b></div>
+        <div class="srv">
+          <div class="sdot" id="sdot" style="position:relative"></div><span id="stxt">connecting</span>
+        </div>
+      </div>
+
+      <!-- ══ TERMINAL ══ -->
+      <div class="pane on" id="p-t">
+        <div class="scrl">
+          <div class="chips">
+            <span class="chip" onclick="sp('write a python reverse shell connecting to 192.168.1.1:4444')">reverse
+              shell</span>
+            <span class="chip" onclick="sp('analyze nmap scan: 22/tcp ssh OpenSSH 7.4, 80/tcp http Apache 2.4.6')">nmap
+              analysis</span>
+            <span class="chip" onclick="sp('write a python port scanner for 192.168.1.0/24')">port scanner</span>
+            <span class="chip" onclick="sp('explain SQL injection with payload examples')">SQLi</span>
+            <span class="chip" onclick="sp('linux privilege escalation techniques and commands')">linux privesc</span>
+            <span class="chip" onclick="sp('write bash script to enumerate users and sudo rights')">enum script</span>
+            <span class="chip" onclick="sp('XSS payload examples for stored and reflected attacks')">XSS payloads</span>
+            <span class="chip" onclick="sp('generate prompt injection test cases for a GPT-4 chatbot app')">prompt
+              injection</span>
+          </div>
+          <div class="compose">
+            <div class="cmeta">
+              <span class="mtag bd" id="mtag">GENERAL</span>
+              <span style="font-family:var(--mono);font-size:8px;color:var(--t3)" id="mdltag">→ dolphin-mistral:7b</span>
+              <span style="margin-left:auto;font-family:var(--mono);font-size:8px;color:var(--t3)">Ctrl+Enter</span>
+            </div>
+            <textarea id="ti" placeholder="Enter prompt — auto-routes to best model..." oninput="oi(this)"
+              onkeydown="hk(event)" rows="3"></textarea>
+            <div class="cfoot">
+              <button class="tog" id="memtog" onclick="tmem()"><span class="tdot"></span><span
+                  id="memlbl">Memory</span></button>
+              <select id="fm" style="font-size:9px;height:24px">
+                <option value="">Auto (Routing)</option>
+                <option value="dolphin-mistral:7b">dolphin-mistral:7b</option>
+                <option value="hf.co/dphn/dolphin-2.9.3-mistral-nemo-12b-gguf:Q5_K_M">dolphin-mistral-nemo:12b (12b Q5)</option>
+                <option value="pentest-assistant">pentest-assistant</option>
+              </select>
+              <button class="btn btn-primary mla" id="sbtn" onclick="doSend()" disabled
+                style="height:24px;padding:0 14px;font-size:9px">Send</button>
+            </div>
+          </div>
+          <div id="log">
+            <div class="empty" id="lempty">_ awaiting input<br /><span style="opacity:.4;font-size:8px">all models local
+                · no data leaves your machine</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CVE INTEL ══ -->
+      <div class="pane" id="p-c">
+        <div class="scrl">
+          <div class="g2" style="align-items:start">
+            <div class="col">
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--a)"></div><span class="ch-title">Lookup</span>
+                </div>
+                <div class="cb col">
+                  <div class="row"><input id="cveid" placeholder="CVE-2024-1234" style="flex:1" /><button
+                      class="btn btn-a" onclick="lookupCVE()">Lookup</button></div>
+                  <div class="row"><input id="cvekw" placeholder="Keyword..." style="flex:1" /><input id="cvelim"
+                      type="number" value="10" min="1" max="20" style="width:48px" /><button class="btn btn-b"
+                      onclick="searchCVEs()">Search</button></div>
+                  <button class="btn w100" onclick="searchCVEs()" style="justify-content:center">Recent CVEs (7
+                    days)</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--a)"></div><span class="ch-title">Results</span><span
+                    id="cvecnt" class="mla" style="font-family:var(--mono);font-size:8px;color:var(--t3)">0</span>
+                </div>
+                <div style="padding:7px;max-height:calc(100vh - 320px);overflow-y:auto" id="cvelist">
+                  <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;padding:2rem">
+                    Search or enter CVE ID</div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="max-height:calc(100vh - 120px)">
+              <div class="ch">
+                <div class="acc" style="background:var(--r)"></div><span class="ch-title">Detail</span>
+                <div class="mla row" style="gap:5px">
+                  <select id="elang" style="font-size:9px;height:22px">
+                    <option>python</option>
+                    <option>bash</option>
+                    <option>go</option>
+                    <option>c</option>
+                    <option>rust</option>
+                    <option>javascript</option>
+                    <option>powershell</option>
+                  </select>
+                  <button class="btn btn-r" id="geb" onclick="genExploit()" disabled
+                    style="height:22px;font-size:8px;padding:0 8px">Gen Exploit</button>
+                </div>
+              </div>
+              <div id="cvedetail" style="padding:10px;overflow-y:auto;max-height:calc(100vh - 175px)">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;padding:3rem">Select
+                  a CVE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ EXPLOIT GEN ══ -->
+      <div class="pane" id="p-e">
+        <div class="scrl">
+          <div class="g2" style="align-items:start">
+            <div class="col">
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--r)"></div><span class="ch-title">Generator</span>
+                </div>
+                <div class="cb col">
+                  <div>
+                    <div class="lbl">CVE ID (optional)</div><input id="egcve" placeholder="CVE-2024-XXXX"
+                      style="width:100%" />
+                  </div>
+                  <div>
+                    <div class="lbl">Vulnerability Description</div><textarea id="egdesc" rows="3"
+                      placeholder="Describe the vulnerability..."></textarea>
+                  </div>
+                  <div class="g2">
+                    <div>
+                      <div class="lbl">Language</div><select id="eglang" style="width:100%">
+                        <option>python</option>
+                        <option>bash</option>
+                        <option>go</option>
+                        <option>c</option>
+                        <option>rust</option>
+                        <option>ruby</option>
+                        <option>javascript</option>
+                        <option>powershell</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div class="lbl">Type</div><select id="egtype" style="width:100%">
+                        <option value="poc">PoC</option>
+                        <option value="full">Full Exploit</option>
+                        <option value="detection">Detection</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary w100" onclick="genExploitFull()"
+                    style="justify-content:center;height:30px">Generate</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--bl)"></div><span class="ch-title">Templates</span>
+                </div>
+                <div class="cb">
+                  <div class="ga">
+                    <div class="chip" onclick="setTmpl('rce')" style="padding:5px 7px">💥 RCE</div>
+                    <div class="chip" onclick="setTmpl('sqli')" style="padding:5px 7px">🗄 SQLi</div>
+                    <div class="chip" onclick="setTmpl('lfi')" style="padding:5px 7px">📁 LFI</div>
+                    <div class="chip" onclick="setTmpl('xss')" style="padding:5px 7px">⚡ XSS</div>
+                    <div class="chip" onclick="setTmpl('ssrf')" style="padding:5px 7px">🌐 SSRF</div>
+                    <div class="chip" onclick="setTmpl('revshell')" style="padding:5px 7px">🐚 Shell</div>
+                    <div class="chip" onclick="setTmpl('privesc')" style="padding:5px 7px">🔑 PrivEsc</div>
+                    <div class="chip" onclick="setTmpl('detect')" style="padding:5px 7px">🔍 Detect</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="max-height:calc(100vh - 120px)">
+              <div class="ch">
+                <div class="acc" style="background:var(--g)"></div><span class="ch-title">Output</span><button
+                  class="btn mla" style="height:20px;font-size:8px"
+                  onclick="navigator.clipboard.writeText(document.getElementById('egout').innerText)">Copy</button>
+              </div>
+              <div id="egout"
+                style="padding:10px;overflow-y:auto;max-height:calc(100vh - 175px);font-family:var(--mono);font-size:9px;color:var(--t3)">
+                Configure above and generate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ RECON ══ -->
+      <div class="pane" id="p-r">
+        <div class="scrl">
+          <div class="card">
+            <div class="ch">
+              <div class="acc" style="background:var(--bl)"></div><span class="ch-title">Recon Planner</span>
+            </div>
+            <div class="cb col">
+              <div class="row">
+                <input id="rtgt" placeholder="Target: domain.com / IP / CIDR / organization..." style="flex:1" />
+                <select id="rtype" style="width:90px">
+                  <option value="passive">Passive</option>
+                  <option value="active">Active</option>
+                  <option value="osint">OSINT</option>
+                  <option value="web">Web App</option>
+                  <option value="network">Network</option>
+                </select>
+                <button class="btn btn-b" onclick="doRecon()">Generate Plan</button>
+              </div>
+              <div class="chips" style="margin-bottom:0">
+                <span class="chip"
+                  onclick="document.getElementById('rtgt').value='example.com';document.getElementById('rtype').value='passive'">domain
+                  passive</span>
+                <span class="chip"
+                  onclick="document.getElementById('rtgt').value='192.168.1.0/24';document.getElementById('rtype').value='active'">network
+                  active</span>
+                <span class="chip"
+                  onclick="document.getElementById('rtgt').value='target org';document.getElementById('rtype').value='osint'">org
+                  osint</span>
+                <span class="chip"
+                  onclick="document.getElementById('rtgt').value='https://example.com';document.getElementById('rtype').value='web'">webapp</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch">
+              <div class="acc" style="background:var(--g)"></div><span class="ch-title">Output</span>
+            </div>
+            <div id="reconout" class="cb md" style="max-height:calc(100vh - 270px);overflow-y:auto">
+              <div style="font-family:var(--mono);font-size:9px;color:var(--t3)">Enter target and generate plan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ AI PENTEST ══ -->
+      <div class="pane" id="p-a">
+        <div class="scrl">
+          <div class="g2" style="align-items:start">
+            <div class="col">
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--p)"></div><span class="ch-title">Attack Type</span>
+                </div>
+                <div class="cb g2">
+                  <div class="akc sel" id="atk-prompt_injection" onclick="selAtk('prompt_injection')">
+                    <div class="aki">💉</div>
+                    <div class="akt">Prompt Injection</div>
+                    <div class="akd">Override system instructions</div>
+                  </div>
+                  <div class="akc" id="atk-jailbreak" onclick="selAtk('jailbreak')">
+                    <div class="aki">🔓</div>
+                    <div class="akt">Jailbreak</div>
+                    <div class="akd">Bypass safety filters</div>
+                  </div>
+                  <div class="akc" id="atk-extraction" onclick="selAtk('extraction')">
+                    <div class="aki">🧲</div>
+                    <div class="akt">Extraction</div>
+                    <div class="akd">Extract training data</div>
+                  </div>
+                  <div class="akc" id="atk-adversarial" onclick="selAtk('adversarial')">
+                    <div class="aki">🎭</div>
+                    <div class="akt">Adversarial</div>
+                    <div class="akd">Encoding / token attacks</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--p)"></div><span class="ch-title">Target Model</span>
+                </div>
+                <div class="cb">
+                  <div class="g3">
+                    <div class="tgt sel" onclick="selTgt(this,'gpt-4')">GPT-4</div>
+                    <div class="tgt" onclick="selTgt(this,'gpt-3.5')">GPT-3.5</div>
+                    <div class="tgt" onclick="selTgt(this,'claude-3')">Claude 3</div>
+                    <div class="tgt" onclick="selTgt(this,'gemini')">Gemini</div>
+                    <div class="tgt" onclick="selTgt(this,'llama3')">Llama 3</div>
+                    <div class="tgt" onclick="selTgt(this,'mistral')">Mistral</div>
+                    <div class="tgt" onclick="selTgt(this,'copilot')">Copilot</div>
+                    <div class="tgt" onclick="selTgt(this,'custom')">Custom</div>
+                  </div>
+                  <input id="ctgt" placeholder="Custom model name..." class="mt6 w100" style="display:none" />
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--p)"></div><span class="ch-title">Context</span>
+                </div>
+                <div class="cb col">
+                  <textarea id="aictx" rows="2"
+                    placeholder="Additional context, known system prompts, endpoints..."></textarea>
+                  <button class="btn btn-primary w100" onclick="doAIPentest()"
+                    style="justify-content:center;height:30px">Generate Payloads</button>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="max-height:calc(100vh - 120px)">
+              <div class="ch">
+                <div class="acc" style="background:var(--p)"></div><span class="ch-title">Payloads</span>
+              </div>
+              <div id="aiout" class="md" style="padding:10px;overflow-y:auto;max-height:calc(100% - 36px)">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--t3)">Configure and generate payloads</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODEL AUDITOR ══ -->
+      <div class="pane" id="p-m">
+        <div class="scrl">
+          <div class="g2" style="align-items:start">
+            <div class="col">
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--bl)"></div><span class="ch-title">Scanner Status</span>
+                </div>
+                <div class="cb" id="instpanel">
+                  <div class="ldr">
+                    <div class="spin"></div>Checking...
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--bl)"></div><span class="ch-title">Target Model</span>
+                </div>
+                <div class="cb"><select id="audmdl" style="width:100%">
+                    <option>llama3</option>
+                    <option>mistral:7b</option>
+                    <option>qwen:7b</option>
+                    <option>deepseek-coder:6.7b</option>
+                    <option>dolphin-llama3</option>
+                  </select></div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--g)"></div><span class="ch-title">Quick Probe <span
+                      class="badge bg" style="margin-left:3px">no install</span></span>
+                </div>
+                <div class="cb col">
+                  <div class="g2">
+                    <div class="prbtn sel" id="pr-injection_resistance" onclick="selProbe('injection_resistance')">
+                      <span>💉</span>Injection</div>
+                    <div class="prbtn" id="pr-system_prompt_leak" onclick="selProbe('system_prompt_leak')">
+                      <span>🔍</span>Prompt Leak</div>
+                    <div class="prbtn" id="pr-hallucination" onclick="selProbe('hallucination')">
+                      <span>🌀</span>Hallucination</div>
+                    <div class="prbtn" id="pr-encoding_bypass" onclick="selProbe('encoding_bypass')">
+                      <span>🔠</span>Encoding</div>
+                  </div>
+                  <button class="btn btn-g w100" onclick="runProbe()" style="justify-content:center;height:28px">Run
+                    Quick Probe</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--r)"></div><span class="ch-title">Garak</span>
+                </div>
+                <div class="cb col">
+                  <div class="chips" id="gchips">
+                    <span class="chip on" data-p="injection" onclick="tgc(this)">injection</span>
+                    <span class="chip" data-p="jailbreak" onclick="tgc(this)">jailbreak</span>
+                    <span class="chip" data-p="leakage" onclick="tgc(this)">leakage</span>
+                    <span class="chip" data-p="dan" onclick="tgc(this)">dan</span>
+                    <span class="chip" data-p="encoding" onclick="tgc(this)">encoding</span>
+                    <span class="chip" data-p="toxicity" onclick="tgc(this)">toxicity</span>
+                    <span class="chip" data-p="all" onclick="tgc(this)">all (slow)</span>
+                  </div>
+                  <button class="btn btn-r w100" id="gbtn" onclick="runGarak()"
+                    style="justify-content:center;height:28px">Run Garak</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--bl)"></div><span class="ch-title">PromptBench</span>
+                </div>
+                <div class="cb col">
+                  <div class="chips">
+                    <span class="chip on" data-a="textfooler" onclick="tpb(this)">textfooler</span>
+                    <span class="chip" data-a="bertattack" onclick="tpb(this)">bertattack</span>
+                    <span class="chip" data-a="checklist" onclick="tpb(this)">checklist</span>
+                    <span class="chip" data-a="deepwordbug" onclick="tpb(this)">deepwordbug</span>
+                  </div>
+                  <button class="btn btn-b w100" id="pbbtn" onclick="runPB()"
+                    style="justify-content:center;height:28px">Run PromptBench</button>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card" id="scorecard" style="display:none">
+                <div class="ch">
+                  <div class="acc" style="background:var(--g)"></div><span class="ch-title">Score</span>
+                </div>
+                <div class="cb" id="scorebody"></div>
+              </div>
+              <div class="card" style="max-height:calc(100vh - 160px)">
+                <div class="ch">
+                  <div class="acc" style="background:var(--g)"></div><span class="ch-title">Results</span><span
+                    id="audts" class="mla" style="font-family:var(--mono);font-size:8px;color:var(--t3)"></span>
+                </div>
+                <div id="audout"
+                  style="padding:10px;overflow-y:auto;max-height:calc(100vh - 220px);font-family:var(--mono);font-size:9px;color:var(--t3)">
+                  Select scan type and run</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div><!-- .main -->
+
+    <!-- STATUSBAR -->
+    <div class="statusbar">
+      <div>REQ <b id="sbtot">0</b></div>
+      <div class="sep">·</div>
+      <div>MODEL <b id="sbmdl">—</b></div>
+      <div class="sep">·</div>
+      <div>MODE <b id="sbmode">—</b></div>
+      <div class="sep">·</div>
+      <div>MEM <b id="sbmem">0/10</b></div>
+      <div class="sep">·</div>
+      <div>UP <b id="sbup" style="color:var(--g)">0s</b></div>
+      <span class="mla">local · private</span>
+    </div>
+
+  </div><!-- .app -->
+
+  <script>
+    const API = 'http://localhost:8000';
+    let useMem = false, total = 0, start = Date.now();
+    let selAttk = 'prompt_injection', selTgtV = 'gpt-4', selProbeV = 'injection_resistance';
+    let garakP = ['injection'], pbA = ['textfooler'], curCVE = null;
+
+    const TITLES = { t: 'terminal', c: 'cve intel', e: 'exploit generator', r: 'recon planner', a: 'ai pentest', m: 'model auditor', l: 'leo chat' };
+    function sw(id) {
+      document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+      document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+      document.getElementById('p-' + id).classList.add('on');
+      document.getElementById('nb-' + id).classList.add('on');
+      document.getElementById('tbt').textContent = TITLES[id] || id;
+    }
+
+    const MK = { ai_pentest: ['prompt injection', 'jailbreak', 'llm', 'ai bypass', 'model extraction', 'adversarial'], cve: ['cve', '0day', 'rce', 'lfi', 'sqli', 'xss', 'ssrf', 'xxe', 'buffer overflow', 'shellcode'], pentest: ['pentest', 'red team', 'privesc', 'privilege escalation', 'lateral movement', 'reverse shell', 'payload'], code: ['code', 'script', 'write a', 'function', 'def ', 'import ', 'bash', 'python', 'golang', 'debug'], analysis: ['analyze', 'scan', 'nmap', 'explain', 'research', 'enumerate', 'audit', 'what is', 'how does'] };
+    const MM = { ai_pentest: 'dolphin-llama3', cve: 'mistral:7b', pentest: 'dolphin-llama3', code: 'deepseek-coder:6.7b', analysis: 'mistral:7b', general: 'mistral:7b' };
+    const MC = { ai_pentest: 'bp', cve: 'ba', pentest: 'br', code: 'bb', analysis: 'bg', general: 'bd' };
+
+    function detMode(p) { const t = p.toLowerCase(); for (const [m, kws] of Object.entries(MK)) if (kws.some(k => t.includes(k))) return m; return 'general' }
+
+    function oi(el) {
+      const v = el.value.trim();
+      document.getElementById('sbtn').disabled = !v;
+      const mode = detMode(v || '');
+      const mt = document.getElementById('mtag');
+      mt.className = 'mtag ' + MC[mode];
+      mt.textContent = mode.replace('_', ' ').toUpperCase();
+      document.getElementById('mdltag').textContent = '→ ' + (document.getElementById('fm').value || MM[mode]);
+    }
+    function hk(e) { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') doSend() }
+    function sp(t) { const el = document.getElementById('ti'); el.value = t; oi(el); el.focus() }
+    function tmem() { useMem = !useMem; const b = document.getElementById('memtog'), l = document.getElementById('memlbl'); b.classList.toggle('on', useMem); l.textContent = useMem ? 'Memory ON' : 'Memory' }
+
+    function rmd(text, el) {
+      marked.setOptions({ breaks: true, gfm: true });
+      const r = new marked.Renderer();
+      r.code = function (code, lang) {
+        const id = 'c' + Math.random().toString(36).slice(2, 6);
+        const esc = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<pre><div class="ctop"><span class="clang">${lang || 'text'}</span><button class="cpbtn" id="${id}" onclick="cp('${id}')">copy</button></div><code id="${id}x">${esc}</code></pre>`;
+      };
+      el.classList.add('md');
+      el.innerHTML = marked.parse(text, { renderer: r });
+    }
+    function cp(id) { const el = document.getElementById(id + 'x'), btn = document.getElementById(id); if (!el || !btn) return; navigator.clipboard.writeText(el.innerText).then(() => { btn.textContent = '✓'; btn.classList.add('ok'); setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('ok') }, 2000) }) }
+
+    async function doSend() {
+      const ta = document.getElementById('ti');
+      const prompt = ta.value.trim(); if (!prompt) return;
+      const mode = detMode(prompt);
+      ta.value = ''; document.getElementById('sbtn').disabled = true;
+      document.getElementById('mtag').className = 'mtag bd';
+      document.getElementById('mtag').textContent = 'ROUTING';
+      const le = document.getElementById('lempty'); if (le) le.remove();
+      const id = 'e' + Date.now();
+      const entry = document.createElement('div');
+      entry.className = 'entry'; entry.id = id;
+      entry.innerHTML = `<div class="eh"><span class="badge bd mtag" id="${id}m">routing</span><span style="font-family:var(--mono);font-size:8px;color:var(--t3)" id="${id}ml"></span><span class="ep">${prompt}</span><span class="et">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span></div><div class="eb loading" id="${id}b"><div class="dots"><span></span><span></span><span></span></div><span>routing...</span></div>`;
+      document.getElementById('log').prepend(entry);
+      try {
+        const res = await fetch(`${API}/ask`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: prompt, use_memory: useMem, force_model: document.getElementById('fm').value }) });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || 'HTTP ' + res.status) }
+        const d = await res.json();
+        const mb = document.getElementById(id + 'm'); mb.textContent = d.mode || mode; mb.className = 'badge ' + (MC[d.mode || mode] || 'bd') + ' mtag';
+        document.getElementById(id + 'ml').textContent = d.model;
+        const body = document.getElementById(id + 'b'); body.classList.remove('loading'); rmd(d.response, body);
+        if (d.detected_cves?.length) {
+          const cr = document.createElement('div'); cr.style.cssText = 'padding:3px 9px 7px;display:flex;gap:3px;flex-wrap:wrap;align-items:center';
+          cr.innerHTML = '<span style="font-family:var(--mono);font-size:8px;color:var(--t3)">CVEs:</span>';
+          d.detected_cves.forEach(c => { const b = document.createElement('span'); b.className = 'dcve'; b.textContent = c; b.onclick = () => { sw('c'); document.getElementById('cveid').value = c; lookupCVE() }; cr.appendChild(b) });
+          entry.appendChild(cr);
+        }
+        total++; document.getElementById('sbtot').textContent = total; document.getElementById('sbmdl').textContent = d.model; document.getElementById('sbmode').textContent = (d.mode || mode).replace('_', ' '); document.getElementById('sbmem').textContent = (d.history_depth || 0) + '/10';
+      } catch (err) { const b = document.getElementById(id + 'b'); b.classList.remove('loading'); b.classList.add('err'); b.textContent = `Error: ${err.message}\n\nCheck: uvicorn app.main:app --reload` }
+    }
+
+    async function lookupCVE() {
+      const id = document.getElementById('cveid').value.trim(); if (!id) return;
+      const list = document.getElementById('cvelist');
+      list.innerHTML = '<div class="ldr"><div class="spin"></div>Looking up ' + id + '...</div>';
+      try { const res = await fetch(`${API}/cve/lookup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cve_id: id, generate_exploit: false }) }); const d = await res.json(); renderCVEDetail(d.cve); document.getElementById('cvecnt').textContent = '1'; list.innerHTML = ''; list.appendChild(mkCVC(d.cve, true)) }
+      catch (e) { list.innerHTML = `<div style="color:var(--r);font-family:var(--mono);font-size:9px;padding:1rem">${e.message}</div>` }
+    }
+    async function searchCVEs() {
+      const kw = document.getElementById('cvekw').value.trim();
+      const lim = parseInt(document.getElementById('cvelim').value) || 10;
+      const list = document.getElementById('cvelist');
+      list.innerHTML = '<div class="ldr"><div class="spin"></div>Searching...</div>';
+      try {
+        const res = await fetch(`${API}/cve/search`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ keyword: kw, limit: lim }) });
+        const d = await res.json(); document.getElementById('cvecnt').textContent = d.count; list.innerHTML = '';
+        if (!d.results.length) { list.innerHTML = '<div style="font-family:var(--mono);font-size:9px;color:var(--t3);text-align:center;padding:1rem">No results</div>'; return }
+        d.results.forEach(c => list.appendChild(mkCVC(c)));
+      } catch (e) { list.innerHTML = `<div style="color:var(--r);font-family:var(--mono);font-size:9px;padding:1rem">${e.message}</div>` }
+    }
+    function mkCVC(cve, active = false) {
+      const d = document.createElement('div'); d.className = 'cvc' + (active ? ' sel' : '');
+      d.onclick = () => { document.querySelectorAll('.cvc').forEach(c => c.classList.remove('sel')); d.classList.add('sel'); renderCVEDetail(cve) };
+      d.innerHTML = `<div class="row"><span class="cvi">${cve.id || '—'}</span><span class="badge sev-${cve.severity || 'UNKNOWN'}" style="font-size:7px">${cve.severity || '?'}</span>${cve.score != null ? `<span style="font-family:var(--mono);font-size:9px;color:var(--t2);margin-left:auto">${cve.score}</span>` : ''}</div><div class="cvd">${cve.description || ''}</div>${cve.published ? `<div style="font-family:var(--mono);font-size:8px;color:var(--t3);margin-top:3px">${cve.published}</div>` : ''}`;
+      return d;
+    }
+    function renderCVEDetail(cve) {
+      curCVE = cve;
+      document.getElementById('geb').disabled = false;
+      const det = document.getElementById('cvedetail');
+      const pocs = cve.pocs || {}; const tot = cve.poc_count || 0;
+      const sc = cve.score; const scC = sc >= 9 ? 'var(--r)' : sc >= 7 ? '#ff7722' : sc >= 4 ? 'var(--a)' : 'var(--g)';
+      const ghH = (pocs.github || []).map(i => `<a href="${i.url}" target="_blank" style="display:block;padding:5px 7px;border:1px solid var(--b1);border-radius:2px;background:var(--s3);margin-bottom:3px;text-decoration:none" onmouseover="this.style.borderColor='var(--b3)'" onmouseout="this.style.borderColor='var(--b1)'"><div class="row"><span style="font-family:var(--mono);font-size:9px;color:var(--bl)">${i.name || i.repo || '—'}</span>${i.language ? `<span class="badge bb" style="font-size:7px">${i.language}</span>` : ''} ${i.stars ? `<span style="font-family:var(--mono);font-size:8px;color:var(--a)">★${i.stars}</span>` : ''}</div>${i.description ? `<div style="font-family:var(--mono);font-size:8px;color:var(--t3);margin-top:2px">${i.description}</div>` : ''}</a>`).join('') || '<div style="font-family:var(--mono);font-size:8px;color:var(--t3)">None found</div>';
+      const edbH = (pocs.exploit_db || []).map(i => `<a href="${i.url}" target="_blank" style="display:block;padding:5px 7px;border:1px solid var(--b1);border-radius:2px;background:var(--s3);margin-bottom:3px;text-decoration:none" onmouseover="this.style.borderColor='var(--r2)'" onmouseout="this.style.borderColor='var(--b1)'"><div class="row"><span style="font-family:var(--mono);font-size:8px;color:var(--a)">EDB-${i.id}</span>${i.verified ? `<span class="badge bg" style="font-size:7px">✓</span>` : ''}</div><div style="font-family:var(--mono);font-size:9px;color:var(--t1);margin-top:2px">${i.title || ''}</div></a>`).join('') || '<div style="font-family:var(--mono);font-size:8px;color:var(--t3)">None found</div>';
+      const psH = (pocs.packet_storm || []).map(i => `<a href="${i.url}" target="_blank" style="display:block;padding:4px 7px;border:1px solid var(--b1);border-radius:2px;background:var(--s3);margin-bottom:3px;text-decoration:none;font-family:var(--mono);font-size:9px;color:var(--t1)">${i.title}</a>`).join('') || '<div style="font-family:var(--mono);font-size:8px;color:var(--t3)">None found</div>';
+      const vhH = (pocs.vulhub || []).map(i => `<a href="${i.url}" target="_blank" style="display:block;padding:5px 7px;border:1px solid var(--b1);border-radius:2px;background:var(--s3);margin-bottom:3px;text-decoration:none"><div class="row"><span class="badge bg" style="font-size:7px">🐳 Docker</span><span style="font-family:var(--mono);font-size:9px;color:var(--t1)">${i.name || ''}</span></div></a>`).join('') || '<div style="font-family:var(--mono);font-size:8px;color:var(--t3)">None found</div>';
+      const refs = (cve.references || []).map(r => `<a href="${r}" target="_blank" style="display:block;font-family:var(--mono);font-size:8px;color:var(--bl);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r}</a>`).join('');
+      const cwes = (cve.weaknesses || []).map(w => `<span class="badge bp" style="font-size:7px">${w}</span>`).join(' ');
+      det.innerHTML = `<div class="col">
+    <div class="row" style="flex-wrap:wrap;gap:6px"><span style="font-family:var(--mono);font-size:14px;color:var(--a);font-weight:500">${cve.id || '—'}</span><span class="badge sev-${cve.severity || 'UNKNOWN'}">${cve.severity || '?'}</span>${sc != null ? `<span style="font-family:var(--mono);font-size:18px;font-weight:500;color:${scC}">${sc}</span>` : ''}${cve.kev ? `<span class="badge br">⚠ KEV</span>` : ''}${cve.epss_score != null ? `<span class="badge br" style="font-size:7px">EPSS ${cve.epss_score}%</span>` : ''}</div>
+    ${cve.vector ? `<div style="font-family:var(--mono);font-size:8px;color:var(--t3);background:var(--s3);padding:4px 7px;border-radius:2px;word-break:break-all;border:1px solid var(--b1)">${cve.vector}</div>` : ''}
+    <div><div class="lbl">Description</div><div style="font-size:12px;line-height:1.75">${cve.description || 'N/A'}</div></div>
+    ${cwes ? `<div><div class="lbl">Weaknesses</div><div class="row" style="flex-wrap:wrap;gap:3px;margin-top:3px">${cwes}</div></div>` : ''}
+    <div style="padding:6px 8px;background:var(--s3);border-radius:2px;border:1px solid var(--b1)"><span style="font-family:var(--mono);font-size:9px;color:${tot > 0 ? 'var(--r)' : 'var(--t3)'}">${tot > 0 ? '⚠' : '○'} ${tot} exploit${tot !== 1 ? 's' : ''} · GH:${(pocs.github || []).length} EDB:${(pocs.exploit_db || []).length} PS:${(pocs.packet_storm || []).length} VH:${(pocs.vulhub || []).length}</span></div>
+    <div><div class="lbl">GitHub PoCs (${(pocs.github || []).length})</div>${ghH}</div>
+    <div><div class="lbl">ExploitDB (${(pocs.exploit_db || []).length})</div>${edbH}</div>
+    <div><div class="lbl">PacketStorm (${(pocs.packet_storm || []).length})</div>${psH}</div>
+    <div><div class="lbl">Vulhub (${(pocs.vulhub || []).length})</div>${vhH}</div>
+    ${refs ? `<div><div class="lbl">References</div>${refs}</div>` : ''}
+  </div>`;
+    }
+    async function genExploit() {
+      if (!curCVE) return; const lang = document.getElementById('elang').value;
+      const btn = document.getElementById('geb'); btn.disabled = true; btn.textContent = '...';
+      const det = document.getElementById('cvedetail');
+      const ldr = document.createElement('div'); ldr.className = 'ldr'; ldr.innerHTML = `<div class="spin"></div>Generating ${lang} exploit...`; det.appendChild(ldr);
+      try {
+        const res = await fetch(`${API}/cve/lookup`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cve_id: curCVE.id, generate_exploit: true, language: lang, exploit_type: 'poc' }) });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || 'HTTP ' + res.status) }
+        const d = await res.json(); ldr.remove();
+        if (d.exploit) { const out = document.createElement('div'); out.style.cssText = 'margin-top:10px;border-top:1px solid var(--b1);padding-top:9px'; out.innerHTML = `<div class="lbl" style="color:var(--g);margin-bottom:5px">Generated · ${lang}</div>`; rmd(d.exploit, out); det.appendChild(out) }
+      } catch (e) { ldr.remove(); const err = document.createElement('div'); err.style.cssText = 'color:var(--r);font-family:var(--mono);font-size:9px;margin-top:7px'; err.textContent = 'Error: ' + e.message; det.appendChild(err) }
+      finally { btn.disabled = false; btn.textContent = 'Gen Exploit' }
+    }
+
+    const TMPLS = { rce: { desc: 'Remote code execution via command injection. Application passes unsanitized input to system() calls.', type: 'poc' }, sqli: { desc: 'SQL injection in login form. Username parameter allows UNION-based extraction.', type: 'poc' }, lfi: { desc: 'Local file inclusion. The file GET parameter allows directory traversal.', type: 'poc' }, xss: { desc: 'Stored XSS in comment field. Input reflected without sanitization.', type: 'poc' }, ssrf: { desc: 'SSRF in URL fetching endpoint. User-provided URLs fetched without validation.', type: 'poc' }, revshell: { desc: 'Reverse shell payload connecting back to attacker listener.', type: 'full' }, privesc: { desc: 'Linux privilege escalation via SUID binary or sudo misconfiguration.', type: 'full' }, detect: { desc: 'Scanner to detect vulnerable hosts on a network.', type: 'detection' } };
+    function setTmpl(t) { const m = TMPLS[t]; if (!m) return; document.getElementById('egdesc').value = m.desc; document.getElementById('egtype').value = m.type }
+    async function genExploitFull() {
+      const desc = document.getElementById('egdesc').value.trim(); if (!desc) { alert('Enter description'); return }
+      const out = document.getElementById('egout'); out.className = '';
+      out.innerHTML = '<div class="ldr"><div class="spin"></div>Generating...</div>';
+      try { const res = await fetch(`${API}/exploit/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cve_id: document.getElementById('egcve').value || 'N/A', description: desc, language: document.getElementById('eglang').value, exploit_type: document.getElementById('egtype').value }) }); const d = await res.json(); out.innerHTML = ''; rmd(d.exploit || d.payload || 'No output', out) }
+      catch (e) { out.innerHTML = `<div style="color:var(--r);font-family:var(--mono);font-size:9px">${e.message}</div>` }
+    }
+
+    async function doRecon() {
+      const tgt = document.getElementById('rtgt').value.trim(); if (!tgt) { alert('Enter target'); return }
+      const out = document.getElementById('reconout'); out.className = 'cb'; out.innerHTML = '<div class="ldr"><div class="spin"></div>Generating recon plan...</div>';
+      try { const res = await fetch(`${API}/pentest/recon`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target: tgt, recon_type: document.getElementById('rtype').value }) }); const d = await res.json(); out.innerHTML = ''; rmd(d.recon_plan, out) }
+      catch (e) { out.innerHTML = `<div style="color:var(--r);font-family:var(--mono);font-size:9px">${e.message}</div>` }
+    }
+
+    function selAtk(t) { selAttk = t; document.querySelectorAll('.akc').forEach(c => c.classList.remove('sel')); document.getElementById('atk-' + t).classList.add('sel') }
+    function selTgt(el, v) { selTgtV = v; document.querySelectorAll('.tgt').forEach(t => t.classList.remove('sel')); el.classList.add('sel'); document.getElementById('ctgt').style.display = v === 'custom' ? 'block' : 'none' }
+    async function doAIPentest() {
+      const tgt = selTgtV === 'custom' ? document.getElementById('ctgt').value.trim() : selTgtV; if (!tgt) { alert('Select target'); return }
+      const out = document.getElementById('aiout'); out.className = ''; out.innerHTML = '<div class="ldr"><div class="spin"></div>Generating payloads...</div>';
+      try { const res = await fetch(`${API}/ai-pentest`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target_model: tgt, attack_type: selAttk, context: document.getElementById('aictx').value }) }); const d = await res.json(); out.innerHTML = ''; rmd(d.payloads, out); total++; document.getElementById('sbtot').textContent = total }
+      catch (e) { out.innerHTML = `<div style="color:var(--r);font-family:var(--mono);font-size:9px">${e.message}</div>` }
+    }
+
+    function selProbe(t) { selProbeV = t; document.querySelectorAll('.prbtn').forEach(b => b.classList.remove('sel')); document.getElementById('pr-' + t).classList.add('sel') }
+    function tgc(el) { el.classList.toggle('on'); const p = el.dataset.p; garakP = garakP.includes(p) ? garakP.filter(x => x !== p) : [...garakP, p] }
+    function tpb(el) { el.classList.toggle('on'); const a = el.dataset.a; pbA = pbA.includes(a) ? pbA.filter(x => x !== a) : [...pbA, a] }
+    function setAO(html) { document.getElementById('audout').innerHTML = html; document.getElementById('audts').textContent = new Date().toLocaleTimeString() }
+
+    async function loadStatus() {
+      const p = document.getElementById('instpanel');
+      try {
+        const r = await fetch(`${API}/scanner/status`); const d = await r.json();
+        p.innerHTML = `<div class="irow"><span style="font-family:var(--mono);font-size:9px">Garak</span><span class="badge ${d.garak ? 'bg' : 'br'}">${d.garak ? '✓ installed' : '✗ missing'}</span>${!d.garak ? `<button class="btn mla" style="height:20px;font-size:8px" onclick="instTool('garak')">Install</button>` : ''}</div><div class="irow"><span style="font-family:var(--mono);font-size:9px">PromptBench</span><span class="badge ${d.promptbench ? 'bg' : 'br'}">${d.promptbench ? '✓ installed' : '✗ missing'}</span>${!d.promptbench ? `<button class="btn mla" style="height:20px;font-size:8px" onclick="instTool('promptbench')">Install</button>` : ''}</div>`;
+      } catch (e) { p.innerHTML = `<div style="color:var(--r);font-family:var(--mono);font-size:9px">${e.message}</div>` }
+    }
+    async function instTool(pkg) {
+      document.getElementById('instpanel').innerHTML = '<div class="ldr"><div class="spin"></div>Installing ' + pkg + '...</div>';
+      const r = await fetch(`${API}/scanner/install`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ package: pkg }) });
+      const d = await r.json(); d.success ? setTimeout(loadStatus, 1000) : document.getElementById('instpanel').innerHTML = `<div style="color:var(--r);font-family:var(--mono);font-size:9px">Failed: ${d.error}</div>`;
+    }
+
+    function renderAuditResults(data) {
+      if (data.status === 'not_installed') { setAO(`<div style="color:var(--a)">${data.message}</div>`); return }
+      if (data.status === 'error' || data.status === 'timeout') { setAO(`<div style="color:var(--r)">${data.message || data.status}</div>`); return }
+      const results = data.results || []; if (!results.length) { setAO('<div style="color:var(--t3)">No results</div>'); return }
+      const passed = results.filter(r => r.status === 'pass').length;
+      const score = Math.round(passed / results.length * 100);
+      const color = score >= 80 ? 'var(--g)' : score >= 50 ? 'var(--a)' : 'var(--r)';
+      document.getElementById('scorecard').style.display = 'block';
+      document.getElementById('scorebody').innerHTML = `<div class="row" style="gap:10px"><div class="sring" style="border-color:${color}"><span style="font-family:var(--mono);font-size:16px;font-weight:500;color:${color}">${score}%</span><span style="font-family:var(--mono);font-size:7px;color:var(--t3)">SAFETY</span></div><div><div style="font-family:var(--mono);font-size:9px;color:var(--t2)">Model: <span style="color:var(--bl)">${data.model || '—'}</span></div><div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:2px">${passed}/${results.length} passed</div><div class="mt6"><span class="badge" style="color:${color};border-color:${color}">${score >= 80 ? 'ROBUST' : score >= 50 ? 'MODERATE' : 'VULNERABLE'}</span></div></div></div>`;
+      let html = '';
+      results.forEach(r => {
+        const ic = r.status === 'pass' ? 'var(--g)' : r.status === 'fail' ? 'var(--r)' : r.status === 'warn' ? 'var(--a)' : 'var(--t3)';
+        const si = r.status === 'pass' ? '✓' : r.status === 'fail' ? '✗' : '△';
+        if (r.input !== undefined) {
+          html += `<div class="rrow r${r.status === 'pass' ? 'pass' : r.status === 'fail' ? 'fail' : r.status === 'warn' ? 'warn' : 'err'}" style="flex-direction:column;gap:3px"><div class="row"><span style="color:${ic};font-size:10px">${si}</span>${r.flagged ? `<span class="badge br" style="font-size:7px">flagged</span>` : ''}</div><div style="font-family:var(--mono);font-size:8px;color:var(--a)">IN: ${r.input}</div>${r.response ? `<div style="font-size:9px;color:var(--t2);background:var(--bg);padding:3px 6px;border-radius:2px;word-break:break-word">${r.response}</div>` : ''}</div>`;
+        } else {
+          html += `<div class="rrow r${r.status === 'pass' ? 'pass' : r.status === 'fail' ? 'fail' : r.status === 'warn' ? 'warn' : 'err'}"><span style="color:${ic};font-size:10px">${si}</span><span style="font-family:var(--mono);font-size:9px;flex:1">${r.probe || r.attack || '—'}</span>${r.passed !== undefined ? `<span style="font-family:var(--mono);font-size:8px;color:var(--t3)">${r.passed}/${r.total}</span>` : ''}<span style="font-family:var(--mono);font-size:10px;font-weight:500;color:${ic}">${r.score !== undefined ? r.score + '%' : ''}</span></div>`;
+        }
+      });
+      setAO(html);
+    }
+
+    async function runProbe() {
+      const mdl = document.getElementById('audmdl').value;
+      setAO('<div class="ldr"><div class="spin"></div>Running ' + selProbeV.replace('_', ' ') + ' probe on ' + mdl + '...</div>');
+      document.getElementById('scorecard').style.display = 'none';
+      try { const r = await fetch(`${API}/scanner/probe`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model_name: mdl, probe_type: selProbeV }) }); renderAuditResults(await r.json()) }
+      catch (e) { setAO(`<div style="color:var(--r);font-family:var(--mono);font-size:9px">${e.message}</div>`) }
+    }
+    async function runGarak() {
+      if (!garakP.length) { alert('Select at least one probe'); return }
+      const mdl = document.getElementById('audmdl').value;
+      const btn = document.getElementById('gbtn'); btn.textContent = 'Scanning...'; btn.disabled = true;
+      document.getElementById('scorecard').style.display = 'none';
+      setAO('<div class="ldr"><div class="spin"></div>Running Garak [' + garakP.join(', ') + '] — may take several minutes...</div>');
+      try { const r = await fetch(`${API}/scanner/garak`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model_name: mdl, probes: garakP }) }); renderAuditResults(await r.json()) }
+      catch (e) { setAO(`<div style="color:var(--r);font-family:var(--mono);font-size:9px">${e.message}</div>`) }
+      finally { btn.textContent = 'Run Garak'; btn.disabled = false }
+    }
+    async function runPB() {
+      if (!pbA.length) { alert('Select at least one attack'); return }
+      const mdl = document.getElementById('audmdl').value;
+      const btn = document.getElementById('pbbtn'); btn.textContent = 'Running...'; btn.disabled = true;
+      document.getElementById('scorecard').style.display = 'none';
+      setAO('<div class="ldr"><div class="spin"></div>Running PromptBench [' + pbA.join(', ') + ']...</div>');
+      try { const r = await fetch(`${API}/scanner/promptbench`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model_name: mdl, attacks: pbA }) }); renderAuditResults(await r.json()) }
+      catch (e) { setAO(`<div style="color:var(--r);font-family:var(--mono);font-size:9px">${e.message}</div>`) }
+      finally { btn.textContent = 'Run PromptBench'; btn.disabled = false }
+    }
+
+    async function checkHealth() {
+      const dot = document.getElementById('sdot'), txt = document.getElementById('stxt');
+      try {
+        const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(3000) });
+        if (r.ok) {
+          dot.classList.add('on'); txt.textContent = 'online';
+          const d = await r.json(); const sel = document.getElementById('fm'); const ex = Array.from(sel.options).map(o => o.value);
+          (d.models_available || []).forEach(m => { if (!ex.includes(m)) { const o = document.createElement('option'); o.value = m; o.textContent = m; sel.appendChild(o) } });
+        } else { dot.classList.remove('on'); txt.textContent = 'error' }
+      } catch (_) { dot.classList.remove('on'); txt.textContent = 'offline' }
+    }
+    checkHealth(); setInterval(checkHealth, 15000);
+    setInterval(() => { const s = Math.floor((Date.now() - start) / 1000), m = Math.floor(s / 60), sec = s % 60; document.getElementById('sbup').textContent = m > 0 ? m + 'm' + sec + 's' : s + 's' }, 1000);
+
+  </script>
+</body>
+
+</html>

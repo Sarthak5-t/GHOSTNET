@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>GHOSTNET // CYBER INTELLIGENCE</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="static/css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDENAV - EXPANDABLE & GLASSMORPHIC -->
+    <nav class="sidenav" id="sidenav">
+      <div class="logo">◈</div>
+      <div class="nsep"></div>
+      <div class="nb on" id="nb-t" data-tip="TERMINAL [CTRL+T]" onclick="sw('t')">⌨</div>
+      <div class="nb" id="nb-c" data-tip="CVE INTELLIGENCE" onclick="sw('c')">◉</div>
+      <div class="nb" id="nb-e" data-tip="EXPLOIT ARCHITECT" onclick="sw('e')">⚡</div>
+      <div class="nb" id="nb-r" data-tip="RECON PLANNER" onclick="sw('r')">◎</div>
+      <div class="nb" id="nb-a" data-tip="AI PENTESTING" onclick="sw('a')">🤖</div>
+      <div class="nb" id="nb-m" data-tip="MODEL AUDITOR" onclick="sw('m');loadStatus()">⬡</div>
+      <div class="nsep"></div>
+      <div class="nb" id="nb-l" data-tip="BRAVE LEO AI" onclick="window.open('https://search.brave.com/ask', 'BraveLeo', 'width=1100,height=900,menubar=no,status=no')" style="color:var(--accent)">◈</div>
+    </nav>
+
+    <!-- MAIN DASHBOARD AREA -->
+    <div class="main">
+      <div class="topbar">
+        <div class="tb-title">GHOSTNET PROTOCOL // <b id="tbt">TERMINAL</b></div>
+        <div class="srv">
+          <div class="sdot on" id="sdot"></div>
+          <span id="stxt">SYSTEM ONLINE</span>
+        </div>
+      </div>
+
+      <!-- ══ TERMINAL [P-T] ══ -->
+      <div class="pane on" id="p-t">
+        <div class="scrl">
+          <div class="chips">
+            <span class="chip" onclick="sp('write a python reverse shell connecting to 192.168.1.1:4444')">◈ Reverse Shell</span>
+            <span class="chip" onclick="sp('analyze nmap scan: 22/tcp ssh OpenSSH 7.4, 80/tcp http Apache 2.4.6')">◈ Nmap Analysis</span>
+            <span class="chip" onclick="sp('write a python port scanner for 192.168.1.0/24')">◈ Port Scanner</span>
+            <span class="chip" onclick="sp('explain SQL injection with payload examples')">◈ SQLi Payloads</span>
+            <span class="chip" onclick="sp('linux privilege escalation techniques and commands')">◈ Linux PrivEsc</span>
+            <span class="chip" onclick="sp('write bash script to enumerate users and sudo rights')">◈ Enum Script</span>
+            <span class="chip" onclick="sp('XSS payload examples for stored and reflected attacks')">◈ XSS Payloads</span>
+            <span class="chip" onclick="sp('generate prompt injection test cases for a GPT-4 chatbot app')">◈ Injection Tests</span>
+          </div>
+
+          <div class="compose">
+            <div class="cmeta">
+              <span class="badge bd" id="mtag">GENERAL</span>
+              <span style="font-family:var(--mono);font-size:9px;color:var(--t3)" id="mdltag">→ dolphin-mistral:7b</span>
+              <div class="mla row" style="gap:var(--s-sm)">
+                <span style="font-family:var(--mono);font-size:9px;color:var(--t3)">CTRL + ENTER</span>
+              </div>
+            </div>
+            <textarea id="ti" placeholder="Initiate offensive query or strategic analysis..." oninput="oi(this)" onkeydown="hk(event)" rows="3"></textarea>
+            <div class="cfoot">
+              <button class="btn" id="memtog" onclick="tmem()">
+                <div class="tdot"></div>
+                <span id="memlbl">MEMORY</span>
+              </button>
+              <div class="mla row">
+                <select id="fm" style="width:180px;height:32px;font-size:10px">
+                  <option value="">AUTOMATIC ROUTING</option>
+                  <option value="dolphin-mistral:7b">DOLPHIN-MISTRAL:7B</option>
+                  <option value="hf.co/dphn/dolphin-2.9.3-mistral-nemo-12b-gguf:Q5_K_M">DOLPHIN-MISTRAL-NEMO:12B</option>
+                  <option value="pentest-assistant">PENTEST-ASSISTANT</option>
+                </select>
+                <button class="btn btn-primary" id="sbtn" onclick="doSend()" disabled style="height:32px">EXECUTE</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="log">
+            <div class="empty" id="lempty">
+              <div style="font-size:24px;margin-bottom:12px;opacity:0.2">⌨</div>
+              AWAITING COMMAND INPUT<br/>
+              <span style="opacity:.4;font-size:9px">SECURE LOCAL PIPELINE ACTIVE · NO DATA LEAKS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CVE INTELLIGENCE [P-C] ══ -->
+      <div class="pane" id="p-c">
+        <div class="scrl">
+          <div class="g2" style="align-items:start">
+            <div class="col">
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--accent)"></div>
+                  <span class="ch-title">STRATEGIC LOOKUP</span>
+                </div>
+                <div class="cb col">
+                  <div class="row">
+                    <input id="cveid" placeholder="CVE-2024-XXXX" style="flex:1" />
+                    <button class="btn btn-a" onclick="lookupCVE()">LOOKUP</button>
+                  </div>
+                  <div class="row">
+                    <input id="cvekw" placeholder="KEYWORD ANALYSIS..." style="flex:1" />
+                    <input id="cvelim" type="number" value="10" min="1" max="25" style="width:60px" />
+                    <button class="btn btn-b" onclick="searchCVEs()">SEARCH</button>
+                  </div>
+                  <button class="btn w100" onclick="searchCVEs()" style="justify-content:center">FETCH RECENT VULNERABILITIES (7D)</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--accent)"></div>
+                  <span class="ch-title">THREAT FEED</span>
+                  <span id="cvecnt" class="mla badge bd">0</span>
+                </div>
+                <div style="padding:12px;max-height:calc(100vh - 360px);overflow-y:auto" id="cvelist">
+                  <div class="empty">INITIATE SEARCH TO POPULATE FEED</div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="max-height:calc(100vh - 120px)">
+              <div class="ch">
+                <div class="acc" style="background:var(--error)"></div>
+                <span class="ch-title">INTELLIGENCE BRIEF</span>
+                <div class="mla row" style="gap:var(--s-sm)">
+                  <select id="elang" style="width:100px;height:24px;font-size:10px">
+                    <option>PYTHON</option>
+                    <option>BASH</option>
+                    <option>GO</option>
+                    <option>C</option>
+                    <option>RUST</option>
+                    <option>JS</option>
+                  </select>
+                  <button class="btn btn-r" id="geb" onclick="genExploit()" disabled style="height:24px">GENERATE EXPLOIT</button>
+                </div>
+              </div>
+              <div id="cvedetail" style="padding:16px;overflow-y:auto;max-height:calc(100vh - 175px)">
+                <div class="empty">SELECT A VULNERABILITY TO DEPLOY ANALYTICS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ EXPLOIT ARCHITECT [P-E] ══ -->
+      <div class="pane" id="p-e">
+        <div class="scrl">
+          <div class="g2" style="align-items:start">
+            <div class="col">
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--error)"></div>
+                  <span class="ch-title">EXPLOIT GENERATOR</span>
+                </div>
+                <div class="cb col">
+                  <div>
+                    <div class="lbl">VULNERABILITY ID</div>
+                    <input id="egcve" placeholder="CVE-2024-XXXX" />
+                  </div>
+                  <div>
+                    <div class="lbl">VULNERABILITY CHARACTERISTICS</div>
+                    <textarea id="egdesc" rows="3" placeholder="Describe target behavior, stack traces, or observed vulnerabilities..."></textarea>
+                  </div>
+                  <div class="g2">
+                    <div>
+                      <div class="lbl">PAYLOAD LANGUAGE</div>
+                      <select id="eglang">
+                        <option>PYTHON</option>
+                        <option>BASH</option>
+                        <option>GO</option>
+                        <option>C</option>
+                        <option>RUST</option>
+                        <option>RUBY</option>
+                        <option>POWERSHELL</option>
+                      </select>
+                    </div>
+                    <div>
+                      <div class="lbl">OBJECTIVE</div>
+                      <select id="egtype">
+                        <option value="poc">PROOF OF CONCEPT</option>
+                        <option value="full">FULL EXPLOIT</option>
+                        <option value="detection">DETECTION SCRIPT</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary w100" onclick="genExploitFull()" style="height:36px">SYNTHESIZE PAYLOAD</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--secondary)"></div>
+                  <span class="ch-title">ATTACK BLUEPRINTS</span>
+                </div>
+                <div class="cb">
+                  <div class="ga">
+                    <div class="chip" onclick="setTmpl('rce')">💥 RCE</div>
+                    <div class="chip" onclick="setTmpl('sqli')">🗄 SQLI</div>
+                    <div class="chip" onclick="setTmpl('lfi')">📁 LFI</div>
+                    <div class="chip" onclick="setTmpl('xss')">⚡ XSS</div>
+                    <div class="chip" onclick="setTmpl('ssrf')">🌐 SSRF</div>
+                    <div class="chip" onclick="setTmpl('revshell')">🐚 SHELL</div>
+                    <div class="chip" onclick="setTmpl('privesc')">🔑 PRIV-ESC</div>
+                    <div class="chip" onclick="setTmpl('detect')">🔍 SCANNER</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="max-height:calc(100vh - 120px)">
+              <div class="ch">
+                <div class="acc" style="background:var(--primary)"></div>
+                <span class="ch-title">COMPILED OUTPUT</span>
+                <button class="btn mla" style="height:24px" onclick="navigator.clipboard.writeText(document.getElementById('egout').innerText)">COPY TO BUFFER</button>
+              </div>
+              <div id="egout" style="padding:16px;overflow-y:auto;max-height:calc(100vh - 175px);font-family:var(--mono);font-size:12px;color:var(--t2)">
+                <div class="empty">CONFIGURE PARAMETERS AND EXECUTE SYNTHESIS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ RECON PLANNER [P-R] ══ -->
+      <div class="pane" id="p-r">
+        <div class="scrl">
+          <div class="card">
+            <div class="ch">
+              <div class="acc" style="background:var(--secondary)"></div>
+              <span class="ch-title">RECONNAISSANCE STRATEGY</span>
+            </div>
+            <div class="cb col">
+              <div class="row">
+                <input id="rtgt" placeholder="Target Asset: domain.com / CIDR / ORG..." style="flex:1" />
+                <select id="rtype" style="width:140px">
+                  <option value="passive">PASSIVE RECON</option>
+                  <option value="active">ACTIVE SCAN</option>
+                  <option value="osint">OSINT HARVEST</option>
+                  <option value="web">WEB APP ANALYSIS</option>
+                  <option value="network">NETWORK MAP</option>
+                </select>
+                <button class="btn btn-b" onclick="doRecon()">GENERATE PLAN</button>
+              </div>
+              <div class="chips" style="margin-bottom:0">
+                <span class="chip" onclick="document.getElementById('rtgt').value='example.com';document.getElementById('rtype').value='passive'">DOMAIN PASSIVE</span>
+                <span class="chip" onclick="document.getElementById('rtgt').value='192.168.1.0/24';document.getElementById('rtype').value='active'">NETWORK ACTIVE</span>
+                <span class="chip" onclick="document.getElementById('rtgt').value='target org';document.getElementById('rtype').value='osint'">ORG OSINT</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch">
+              <div class="acc" style="background:var(--primary)"></div>
+              <span class="ch-title">OPERATIONAL PLAN</span>
+            </div>
+            <div id="reconout" class="cb md" style="max-height:calc(100vh - 270px);overflow-y:auto">
+              <div class="empty">DEFINE TARGET TO DEPLOY RECONNAISSANCE PIPELINE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ AI PENTEST [P-A] ══ -->
+      <div class="pane" id="p-a">
+        <div class="scrl">
+          <div class="g2" style="align-items:start">
+            <div class="col">
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--primary)"></div>
+                  <span class="ch-title">ATTACK VECTOR SELECTION</span>
+                </div>
+                <div class="cb g2">
+                  <div class="akc sel" id="atk-prompt_injection" onclick="selAtk('prompt_injection')">
+                    <div class="aki">💉</div>
+                    <div class="akt">PROMPT INJECTION</div>
+                    <div class="akd">Strategic instruction override</div>
+                  </div>
+                  <div class="akc" id="atk-jailbreak" onclick="selAtk('jailbreak')">
+                    <div class="aki">🔓</div>
+                    <div class="akt">JAILBREAK</div>
+                    <div class="akd">Bypass core safety logic</div>
+                  </div>
+                  <div class="akc" id="atk-extraction" onclick="selAtk('extraction')">
+                    <div class="aki">🧲</div>
+                    <div class="akt">DATA EXTRACTION</div>
+                    <div class="akd">Exfiltrate training weights</div>
+                  </div>
+                  <div class="akc" id="atk-adversarial" onclick="selAtk('adversarial')">
+                    <div class="aki">🎭</div>
+                    <div class="akt">ADVERSARIAL</div>
+                    <div class="akd">Encoding / Token pressure</div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--secondary)"></div>
+                  <span class="ch-title">TARGET ARCHITECTURE</span>
+                </div>
+                <div class="cb">
+                  <div class="g3">
+                    <div class="tgt sel" onclick="selTgt(this,'gpt-4')">GPT-4</div>
+                    <div class="tgt" onclick="selTgt(this,'gpt-3.5')">GPT-3.5</div>
+                    <div class="tgt" onclick="selTgt(this,'claude-3')">CLAUDE-3</div>
+                    <div class="tgt" onclick="selTgt(this,'gemini')">GEMINI</div>
+                    <div class="tgt" onclick="selTgt(this,'llama3')">LLAMA-3</div>
+                    <div class="tgt" onclick="selTgt(this,'mistral')">MISTRAL</div>
+                  </div>
+                  <input id="ctgt" placeholder="Enter custom model endpoint..." class="mt6 w100" style="display:none" />
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--primary)"></div>
+                  <span class="ch-title">OPERATIONAL CONTEXT</span>
+                </div>
+                <div class="cb col">
+                  <textarea id="aictx" rows="2" placeholder="System prompts, safety filters, or endpoint behavior..."></textarea>
+                  <button class="btn btn-primary w100" onclick="doAIPentest()" style="height:36px">DEPLOY PAYLOADS</button>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="max-height:calc(100vh - 120px)">
+              <div class="ch">
+                <div class="acc" style="background:var(--primary)"></div>
+                <span class="ch-title">SYNTHESIZED PAYLOADS</span>
+              </div>
+              <div id="aiout" class="md" style="padding:16px;overflow-y:auto;max-height:calc(100% - 48px)">
+                <div class="empty">AWAITING ARCHITECTURE CONFIGURATION</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODEL AUDITOR [P-M] ══ -->
+      <div class="pane" id="p-m">
+        <div class="scrl">
+          <div class="g2" style="align-items:start">
+            <div class="col">
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--secondary)"></div>
+                  <span class="ch-title">SCANNER STATUS</span>
+                </div>
+                <div class="cb" id="instpanel">
+                  <div class="empty">CHECKING SUBSYSTEMS...</div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--primary)"></div>
+                  <span class="ch-title">AUDIT TARGET</span>
+                </div>
+                <div class="cb">
+                  <select id="audmdl" style="width:100%">
+                    <option>DOLPHIN-MISTRAL:7B</option>
+                    <option>DOLPHIN-MISTRAL-NEMO:12B</option>
+                    <option>PENTEST-ASSISTANT</option>
+                  </select>
+                </div>
+              </div>
+              <div class="card">
+                <div class="ch">
+                  <div class="acc" style="background:var(--primary)"></div>
+                  <span class="ch-title">QUICK PROBE ANALYTICS</span>
+                </div>
+                <div class="cb col">
+                  <div class="g2">
+                    <div class="chip on" id="pr-injection_resistance" onclick="selProbe('injection_resistance')">💉 INJECTION</div>
+                    <div class="chip" id="pr-system_prompt_leak" onclick="selProbe('system_prompt_leak')">🔍 LEAKAGE</div>
+                    <div class="chip" id="pr-hallucination" onclick="selProbe('hallucination')">🌀 TRUTH</div>
+                    <div class="chip" id="pr-encoding_bypass" onclick="selProbe('encoding_bypass')">🔠 ENCODING</div>
+                  </div>
+                  <button class="btn btn-g w100" onclick="runProbe()" style="height:32px;margin-top:12px">RUN TELEMETRY PROBE</button>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card" id="scorecard" style="display:none">
+                <div class="ch">
+                  <div class="acc" style="background:var(--primary)"></div>
+                  <span class="ch-title">SAFETY TELEMETRY</span>
+                </div>
+                <div class="cb" id="scorebody"></div>
+              </div>
+              <div class="card" style="max-height:calc(100vh - 160px)">
+                <div class="ch">
+                  <div class="acc" style="background:var(--primary)"></div>
+                  <span class="ch-title">AUDIT RESULTS</span>
+                  <span id="audts" class="mla badge bd"></span>
+                </div>
+                <div id="audout" style="padding:16px;overflow-y:auto;max-height:calc(100vh - 220px);font-family:var(--mono);font-size:11px;color:var(--t2)">
+                  <div class="empty">SELECT SCAN TYPE AND EXECUTE AUDIT</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .main -->
+
+    <!-- STATUSBAR - TELEMETRY STRIPE -->
+    <div class="statusbar">
+      <div class="row">
+        <b>ID:</b> <span id="sbid">GHOST-01</span>
+        <span class="sep">|</span>
+        <b>UP:</b> <span id="sbup">0s</span>
+      </div>
+      <div class="mla row">
+        <b>MDL:</b> <span id="sbmdl" style="color:var(--primary)">—</span>
+        <span class="sep">|</span>
+        <b>MODE:</b> <span id="sbmode" style="color:var(--accent)">—</span>
+        <span class="sep">|</span>
+        <b>MEM:</b> <span id="sbmem" style="color:var(--secondary)">0/10</span>
+        <span class="sep">|</span>
+        <b>TOTAL:</b> <span id="sbtot">0</span>
+      </div>
+    </div>
+
+  </div> <!-- CLOSING APP -->
+
+  <script src="static/js/app.js" defer></script>
+</body>
+
+</html>

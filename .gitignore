@@ -1,0 +1,22 @@
+# Python Caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# Local JSON Cache / Reports
+cve_cache.json
+scan_reports/
+
+# OS / Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Custom UI backups
+terminal_redesign.html
+old_integrations/
